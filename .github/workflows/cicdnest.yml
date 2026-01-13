@@ -21,7 +21,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: npm install -g @railway/cli
-      - run: railway up --serive=cicd_nest
+      - run: railway up --service=cicd_nest
         env:
           RAILWAY_TOKEN: ${{secrets.RAILWAY_TOKEN}}
       - run: echo "레일웨이 배포 완료!"
