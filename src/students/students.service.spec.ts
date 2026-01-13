@@ -1,20 +1,20 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { StudentsService } from './students.service';
-import { CreateStudentDto } from './dto/create-student.dto';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Student } from './entities/student.entity';
 import fc from 'fast-check';
+import { Repository } from 'typeorm';
 
 describe('StudentsService', () => {
   let service: StudentsService;
-  let mockRepo: any;
+  let mockRepo: jest.Mocked<Pick<Repository<Student>, 'create' | 'save'>>;
 
   // 테스트하기 전의 세팅 작업
   beforeEach(async () => {
     mockRepo = {
       create: jest.fn(),
       save: jest.fn(),
-    };
+    } as jest.Mocked<Pick<Repository<Student>, 'create' | 'save'>>;
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -59,12 +59,13 @@ describe('StudentsService', () => {
         }),
         async (dto) => {
           // 각 테스트마다 mock을 초기화
-          mockRepo.create.mockReturnValue(dto);
+          const mockId = Math.floor(Math.random() * 10000) + 1;
+          mockRepo.create.mockReturnValue(dto as Student);
           mockRepo.save.mockResolvedValue({
             ...dto,
-            id: fc.integer({ min: 1, max: 10000 }),
+            id: mockId,
             isActive: true,
-          });
+          } as Student);
 
           const result = await service.create(dto);
 
